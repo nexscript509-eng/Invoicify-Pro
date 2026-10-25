@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoicify Pro - Invoicing & Client Portal System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Print Specific Styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printable-area, #printable-area * {
+        visibility: visible;
+      }
+      #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: white;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="h-full text-slate-800 font-sans antialiased flex flex-col md:flex-row min-h-screen bg-slate-50">
+
+  <!-- ==================== SIDEBAR NAVIGATION ==================== -->
+  <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between border-r border-slate-800 no-print">
+    <div>
+      <!-- Brand Logo Header -->
+      <div class="p-6 flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
+            <i class="fa-solid me-0 fa-file-invoice-dollar text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-white tracking-tight leading-none">Invoicify Pro</h1>
+            <span class="text-[10px] font-semibold text-blue-400 bg-blue-900/40 px-2 py-0.5 rounded-full border border-blue-700/50 mt-1 inline-block">SELF-HOSTED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-4 space-y-1.5">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-blue-600 text-white shadow-md shadow-blue-600/20">
+          <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('invoices')" id="nav-invoices" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-800 hover:text-white">
+          <i class="fa-solid fa-receipt w-5 text-center"></i>
+          <span>Invoices</span>
+        </button>
+        <button onclick="switchTab('clients')" id="nav-clients" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-800 hover:text-white">
+          <i class="fa-solid fa-users w-5 text-center"></i>
+          <span>Client Manager</span>
+        </button>
+        <button onclick="switchTab('portal')" id="nav-portal" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-800 hover:text-white">
+          <i class="fa-solid fa-laptop-code w-5 text-center"></i>
+          <span>Client Portal View</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-slate-800 hover:text-white">
+          <i class="fa-solid fa-sliders w-5 text-center"></i>
+          <span>Settings & Branding</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Sidebar Footer / Status -->
+    <div class="p-4 border-t border-slate-800">
+      <div class="bg-slate-800/60 rounded-xl p-3 flex items-center space-x-3">
+        <div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+          <i class="fa-solid fa-shield-halved text-xs"></i>
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-white">License Validated</p>
+          <p class="text-[11px] text-slate-400">No Monthly Fees</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+    <!-- Top Bar Header -->
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm no-print">
+      <div class="flex items-center space-x-4">
+        <h2 id="page-title" class="text-xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h2>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="openInvoiceModal()" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm hover:shadow-md">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Create Invoice</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Notification / Toast Alert Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Main Dynamic Body Container -->
+    <div class="p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
+
+      <!-- ================= 1. DASHBOARD VIEW ================= -->
+      <section id="tab-dashboard" class="tab-content space-y-6">
+        <!-- Overview Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Total Revenue -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Revenue</span>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fa-solid fa-wallet text-base"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h3 id="stat-revenue" class="text-2xl font-extrabold text-slate-900">$0.00</h3>
+              <p class="text-xs text-emerald-600 font-medium mt-1 flex items-center">
+                <i class="fa-solid fa-arrow-up-right me-1 text-[10px]"></i> Collected lifetime
+              </p>
+            </div>
+          </div>
+
+          <!-- Pending Outstanding -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Outstanding</span>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i class="fa-solid fa-clock text-base"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h3 id="stat-outstanding" class="text-2xl font-extrabold text-slate-900">$0.00</h3>
+              <p class="text-xs text-amber-600 font-medium mt-1 flex items-center">
+                <i class="fa-solid fa-hourglass-half me-1 text-[10px]"></i> Pending payments
+              </p>
+            </div>
+          </div>
+
+          <!-- Paid Count -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Paid Invoices</span>
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <i class="fa-solid fa-circle-check text-base"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h3 id="stat-paid-count" class="text-2xl font-extrabold text-slate-900">0</h3>
+              <p class="text-xs text-slate-500 font-medium mt-1">Successfully settled</p>
+            </div>
+          </div>
+
+          <!-- Overdue Count -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Overdue</span>
+              <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i class="fa-solid fa-triangle-exclamation text-base"></i>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h3 id="stat-overdue-count" class="text-2xl font-extrabold text-slate-900">0</h3>
+              <p class="text-xs text-rose-600 font-medium mt-1">Requires follow up</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Action Banner & Recent Table -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Recent Invoices Table (2 Cols) -->
+          <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+              <h3 class="font-bold text-slate-900 text-base">Recent Invoices</h3>
+              <button onclick="switchTab('invoices')" class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All Invoices &rarr;</button>
+            </div>
+            <div class="overflow-x-auto flex-1">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-100 text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+                    <th class="py-3 px-5">Invoice #</th>
+                    <th class="py-3 px-5">Client</th>
+                    <th class="py-3 px-5">Amount</th>
+                    <th class="py-3 px-5">Status</th>
+                    <th class="py-3 px-5 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-table" class="divide-y divide-slate-100 text-sm">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick Launch Sidebar Widget -->
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white flex flex-col justify-between shadow-lg">
+            <div class="space-y-4">
+              <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-blue-400">
+                <i class="fa-solid fa-rocket text-xl"></i>
+              </div>
+              <h3 class="text-xl font-bold tracking-tight">Generate Invoice Faster</h3>
+              <p class="text-slate-300 text-xs leading-relaxed">
+                Create customizable PDF invoices in seconds, auto-calculate tax/discounts, and share direct payment portal links with client tracking.
+              </p>
+            </div>
+            <div class="mt-6 pt-6 border-t border-slate-700/60 space-y-2">
+              <button onclick="openInvoiceModal()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition text-center block shadow-md">
+                + New Invoice
+              </button>
+              <button onclick="openClientModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2.5 px-4 rounded-xl text-sm transition text-center block border border-slate-700">
+                + Add Client
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 2. INVOICES LIST VIEW ================= -->
+      <section id="tab-invoices" class="tab-content hidden space-y-6">
+        <!-- Invoices Header Control Bar -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+            <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+              <input type="text" id="invoice-search" oninput="renderInvoicesTable()" placeholder="Search invoice # or client..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+            </div>
+            <select id="invoice-filter-status" onchange="renderInvoicesTable()" class="w-full sm:w-auto px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+              <option value="all">All Statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Pending">Pending</option>
+              <option value="Draft">Draft</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+          <button onclick="openInvoiceModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
+            <i class="fa-solid fa-plus text-xs me-1"></i> New Invoice
+          </button>
+        </div>
+
+        <!-- Invoices Main Table -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-100 text-[11px] uppercase tracking-wider font-semibold text-slate-500">
+                  <th class="py-3.5 px-5">Invoice</th>
+                  <th class="py-3.5 px-5">Client</th>
+                  <th class="py-3.5 px-5">Issue Date</th>
+                  <th class="py-3.5 px-5">Due Date</th>
+                  <th class="py-3.5 px-5">Total</th>
+                  <th class="py-3.5 px-5">Status</th>
+                  <th class="py-3.5 px-5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="full-invoices-table" class="divide-y divide-slate-100 text-sm">
+                <!-- JS populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 3. CLIENT MANAGER VIEW ================= -->
+      <section id="tab-clients" class="tab-content hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Client Directory</h3>
+            <p class="text-xs text-slate-500">Manage client contact records, addresses, and payment history.</p>
+          </div>
+          <button onclick="openClientModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
+            <i class="fa-solid fa-user-plus text-xs me-1"></i> Add Client
+          </button>
+        </div>
+
+        <!-- Client Cards Grid -->
+        <div id="clients-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- JS populated client cards -->
+        </div>
+      </section>
+
+      <!-- ================= 4. CLIENT PORTAL SIMULATION ================= -->
+      <section id="tab-portal" class="tab-content hidden space-y-6">
+        <!-- Banner Selector -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-eye text-sm"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-slate-900">Live Client Portal Preview</h4>
+              <p class="text-xs text-slate-500">This is exactly what your client sees when opening their invoice link online.</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-3 w-full sm:w-auto">
+            <select id="portal-invoice-select" onchange="renderPortalView()" class="bg-slate-50 border border-slate-200 rounded-xl text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+              <!-- JS options -->
+            </select>
+            <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-semibold transition shadow-sm">
+              <i class="fa-solid fa-print text-xs me-1"></i> Print / Save PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Printable Interactive Invoice Document Sheet -->
+        <div id="printable-area" class="bg-white rounded-2xl border border-slate-200/90 shadow-lg max-w-4xl mx-auto p-8 md:p-12 space-y-8">
+          <!-- Invoice Header -->
+          <div class="flex flex-col sm:flex-row items-start justify-between border-b border-slate-200 pb-8 gap-6">
+            <div class="space-y-3">
+              <div id="portal-logo-container" class="h-12 flex items-center">
+                <!-- Dynamic Logo or Text -->
+              </div>
+              <div>
+                <h2 id="portal-biz-name" class="text-xl font-bold text-slate-900">Company Name</h2>
+                <p id="portal-biz-address" class="text-xs text-slate-500 whitespace-pre-line mt-1">123 Business St, Suite 100</p>
+                <p id="portal-biz-email" class="text-xs text-slate-500">billing@company.com</p>
+              </div>
+            </div>
+
+            <div class="sm:text-right space-y-2">
+              <span id="portal-status-badge" class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">
+                PAID
+              </span>
+              <h1 id="portal-invoice-num" class="text-2xl font-extrabold text-slate-900 tracking-tight">INV-2026-001</h1>
+              <div class="text-xs text-slate-500 space-y-1">
+                <p>Issue Date: <span id="portal-issue-date" class="font-medium text-slate-800">Oct 20, 2026</span></p>
+                <p>Due Date: <span id="portal-due-date" class="font-medium text-slate-800">Nov 04, 2026</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bill To Details -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 rounded-xl p-5 border border-slate-100">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Billed To</span>
+              <h4 id="portal-client-name" class="text-base font-bold text-slate-900 mt-1">Client Name</h4>
+              <p id="portal-client-company" class="text-xs text-slate-600 font-medium">Company Name</p>
+              <p id="portal-client-email" class="text-xs text-slate-500">client@example.com</p>
+              <p id="portal-client-address" class="text-xs text-slate-500 whitespace-pre-line mt-1">Client Address</p>
+            </div>
+            <div class="sm:text-right flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Amount Due</span>
+                <p id="portal-total-due" class="text-3xl font-extrabold text-slate-900 mt-1">$0.00</p>
+              </div>
+              <div class="no-print mt-4">
+                <button onclick="simulatePayment()" id="portal-pay-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition shadow-md shadow-emerald-600/20">
+                  <i class="fa-solid fa-credit-card me-1 text-xs"></i> Pay Now Online
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Items Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  <th class="py-3 px-2">Description</th>
+                  <th class="py-3 px-2 text-center">Qty</th>
+                  <th class="py-3 px-2 text-right">Unit Price</th>
+                  <th class="py-3 px-2 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="portal-items-table" class="divide-y divide-slate-100 text-sm">
+                <!-- Dynamic Items -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Summary Calculations -->
+          <div class="flex flex-col sm:flex-row justify-between items-start pt-4 border-t border-slate-200 gap-6">
+            <div class="space-y-2 max-w-xs">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Payment Instructions / Notes</span>
+              <p id="portal-notes" class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                Please make bank transfers to Account #1234-5678-90. Thank you for your business!
+              </p>
+            </div>
+
+            <div class="w-full sm:w-64 space-y-2 text-sm">
+              <div class="flex justify-between text-slate-600">
+                <span>Subtotal:</span>
+                <span id="portal-subtotal" class="font-medium">$0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Tax (<span id="portal-tax-rate">0</span>%):</span>
+                <span id="portal-tax-amount" class="font-medium">$0.00</span>
+              </div>
+              <div class="flex justify-between text-slate-600">
+                <span>Discount (<span id="portal-disc-rate">0</span>%):</span>
+                <span id="portal-disc-amount" class="font-medium">-$0.00</span>
+              </div>
+              <div class="flex justify-between text-lg font-extrabold text-slate-900 pt-3 border-t-2 border-slate-900">
+                <span>Total Due:</span>
+                <span id="portal-grand-total">$0.00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Signature Note -->
+          <div class="text-center pt-8 border-t border-slate-100 text-xs text-slate-400">
+            Powered by Invoicify Pro • Premium Self-Hosted Invoice Solution
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. SETTINGS & BRANDING VIEW ================= -->
+      <section id="tab-settings" class="tab-content hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Business Profile Configuration -->
+          <div class="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-6">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Business Profile & Branding</h3>
+              <p class="text-xs text-slate-500">Configure your company identity printed on client invoices.</p>
+            </div>
+
+            <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Business Name</label>
+                  <input type="text" id="set-biz-name" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" required />
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Business Email</label>
+                  <input type="email" id="set-biz-email" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" required />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Business Address</label>
+                <textarea id="set-biz-address" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"></textarea>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Default Currency Symbol</label>
+                  <select id="set-currency" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+                    <option value="$">USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="£">GBP (£)</option>
+                    <option value="₹">INR (₹)</option>
+                    <option value="A$">AUD (A$)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 mb-1">Default Tax Rate (%)</label>
+                  <input type="number" step="0.1" id="set-tax-rate" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Logo URL (Optional)</label>
+                <input type="url" id="set-logo-url" placeholder="https://example.com/logo.png" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Default Payment Notes / Bank Details</label>
+                <textarea id="set-payment-notes" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"></textarea>
+              </div>
+
+              <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition shadow-md">
+                Save Branding Settings
+              </button>
+            </form>
+          </div>
+
+          <!-- Backup & Data Controls -->
+          <div class="space-y-6">
+            <!-- Data Backup Widget -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+              <h4 class="font-bold text-slate-900 text-base">Backup & Restore Data</h4>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Export all invoices, clients, and configuration settings into a JSON backup file.
+              </p>
+              <div class="space-y-2 pt-2">
+                <button onclick="exportDataJSON()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                  <i class="fa-solid fa-download"></i>
+                  <span>Export Complete Database</span>
+                </button>
+
+                <label class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center space-x-2 cursor-pointer border border-slate-200">
+                  <i class="fa-solid fa-upload"></i>
+                  <span>Import Database File</span>
+                  <input type="file" id="import-file" accept=".json" onchange="importDataJSON(event)" class="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Demo Reset Card -->
+            <div class="bg-rose-50 rounded-2xl p-6 border border-rose-100 space-y-3">
+              <h4 class="font-bold text-rose-900 text-sm flex items-center">
+                <i class="fa-solid fa-rotate-left me-2"></i> Reset Demo Data
+              </h4>
+              <p class="text-xs text-rose-700 leading-relaxed">
+                Restore default sample invoices and clients for testing purposes.
+              </p>
+              <button onclick="resetToSampleData()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 px-4 rounded-xl text-xs transition">
+                Reload Sample Database
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== CREATE / EDIT INVOICE MODAL ==================== -->
+  <div id="invoice-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden my-auto">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 id="modal-invoice-title" class="text-lg font-bold text-slate-900">Create New Invoice</h3>
+        <button onclick="closeInvoiceModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form id="invoice-form" onsubmit="handleSaveInvoice(event)" class="p-6 overflow-y-auto space-y-6 flex-1">
+        <input type="hidden" id="inv-id" />
+
+        <!-- Top Header Info -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Invoice Number</label>
+            <input type="text" id="inv-number" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Select Client</label>
+            <select id="inv-client-id" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required>
+              <!-- JS Populated -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+            <select id="inv-status" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+              <option value="Draft">Draft</option>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Overdue">Overdue</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Issue Date</label>
+            <input type="date" id="inv-issue-date" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Due Date</label>
+            <input type="date" id="inv-due-date" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+          </div>
+        </div>
+
+        <!-- Line Items Section -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Line Items</h4>
+            <button type="button" onclick="addInvoiceItemRow()" class="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center">
+              <i class="fa-solid fa-plus text-[10px] me-1"></i> Add Item
+            </button>
+          </div>
+
+          <div class="border border-slate-200 rounded-xl overflow-hidden">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase">
+                  <th class="py-2.5 px-3">Description</th>
+                  <th class="py-2.5 px-3 w-20">Qty</th>
+                  <th class="py-2.5 px-3 w-28">Price ($)</th>
+                  <th class="py-2.5 px-3 w-28 text-right">Total</th>
+                  <th class="py-2.5 px-3 w-10"></th>
+                </tr>
+              </thead>
+              <tbody id="invoice-items-rows" class="divide-y divide-slate-100 text-sm">
+                <!-- Dynamic Item Input Rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tax & Discount Controls -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Client Notes / Payment Terms</label>
+            <textarea id="inv-notes" rows="3" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" placeholder="Bank details or custom terms..."></textarea>
+          </div>
+
+          <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-600">Tax Rate (%):</span>
+              <input type="number" step="0.1" id="inv-tax-rate" oninput="calculateModalTotals()" class="w-20 px-2 py-1 bg-white border border-slate-200 rounded-lg text-right font-medium" value="0" />
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-600">Discount (%):</span>
+              <input type="number" step="0.1" id="inv-discount-rate" oninput="calculateModalTotals()" class="w-20 px-2 py-1 bg-white border border-slate-200 rounded-lg text-right font-medium" value="0" />
+            </div>
+            <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-base font-extrabold text-slate-900">
+              <span>Calculated Total:</span>
+              <span id="modal-calculated-total">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeInvoiceModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition shadow-md">
+            Save Invoice
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== CREATE / EDIT CLIENT MODAL ==================== -->
+  <div id="client-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden my-auto">
+      <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 id="modal-client-title" class="text-lg font-bold text-slate-900">Add New Client</h3>
+        <button onclick="closeClientModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <form id="client-form" onsubmit="handleSaveClient(event)" class="p-6 space-y-4">
+        <input type="hidden" id="client-id" />
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Client Name</label>
+          <input type="text" id="client-name" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Company Name</label>
+          <input type="text" id="client-company" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+          <input type="email" id="client-email" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+          <input type="text" id="client-phone" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Billing Address</label>
+          <textarea id="client-address" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"></textarea>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeClientModal()" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-xl text-sm transition shadow-md">
+            Save Client Record
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT APPLICATION CORE ==================== -->
+  <script>
+    // --- SAMPLE DEFAULT SEED DATA ---
+    const SAMPLE_CLIENTS = [
+      { id: 'cli_1', name: 'Alex Rivera', company: 'Apex Digital Studio', email: 'alex@apexdigital.com', phone: '+1 (555) 019-2834', address: '742 Evergreen Terrace, Suite 400\nAustin, TX 78701' },
+      { id: 'cli_2', name: 'Sophia Chen', company: 'Zenith SaaS Inc', email: 'sophia@zenithsaas.io', phone: '+1 (555) 438-9102', address: '100 Innovation Way\nSan Francisco, CA 94105' },
+      { id: 'cli_3', name: 'Marcus Vance', company: 'Vance Logistics', email: 'marcus@vancelogistics.net', phone: '+1 (555) 782-3311', address: '450 Cargo Blvd\nChicago, IL 60607' }
+    ];
+
+    const SAMPLE_INVOICES = [
+      {
+        id: 'inv_101',
+        number: 'INV-2026-001',
+        clientId: 'cli_1',
+        issueDate: '2026-10-15',
+        dueDate: '2026-11-01',
+        status: 'Paid',
+        taxRate: 5,
+        discountRate: 0,
+        notes: 'Thank you for your business! Bank Wire Details: Account #1002-3948-22',
+        items: [
+          { description: 'Custom Web Application UI Design', qty: 1, price: 1500 },
+          { description: 'Tailwind CSS Development', qty: 25, price: 60 }
+        ]
+      },
+      {
+        id: 'inv_102',
+        number: 'INV-2026-002',
+        clientId: 'cli_2',
+        issueDate: '2026-10-20',
+        dueDate: '2026-11-05',
+        status: 'Pending',
+        taxRate: 8,
+        discountRate: 5,
+        notes: 'Payment due within 15 days.',
+        items: [
+          { description: 'RESTful API Integration & Testing', qty: 1, price: 1200 },
+          { description: 'Serverless Database Migration', qty: 1, price: 800 }
+        ]
+      },
+      {
+        id: 'inv_103',
+        number: 'INV-2026-003',
+        clientId: 'cli_3',
+        issueDate: '2026-09-10',
+        dueDate: '2026-09-25',
+        status: 'Overdue',
+        taxRate: 0,
+        discountRate: 0,
+        notes: 'Late fee of 1.5% applies per month overdue.',
+        items: [
+          { description: 'Monthly Maintenance & Monitoring', qty: 1, price: 450 }
+        ]
+      }
+    ];
+
+    const SAMPLE_SETTINGS = {
+      bizName: 'NexScript Innovations',
+      bizEmail: 'support@nexscript.com',
+      bizAddress: '100 Developer Plaza, Suite 300\nSeattle, WA 98101',
+      currency: '$',
+      taxRate: 5,
+      logoUrl: '',
+      paymentNotes: 'Please process electronic payments to: Routing #021000021 / Account #9876543210'
+    };
+
+    // --- GLOBAL APP STATE ---
+    let appData = {
+      clients: [],
+      invoices: [],
+      settings: {}
+    };
+
+    // --- INITIALIZATION ON WINDOW LOAD ---
+    window.onload = function() {
+      loadStateFromStorage();
+      switchTab('dashboard');
+      updateGlobalStats();
+    };
+
+    // --- LOCAL STORAGE & DATA MANAGERS ---
+    function loadStateFromStorage() {
+      const stored = localStorage.getItem('invoicify_pro_db');
+      if (stored) {
+        try {
+          appData = JSON.parse(stored);
+        } catch(e) {
+          console.error('Error parsing stored JSON:', e);
+          resetToSampleData();
+        }
+      } else {
+        resetToSampleData();
+      }
+    }
+
+    function saveStateToStorage() {
+      localStorage.setItem('invoicify_pro_db', JSON.stringify(appData));
+      updateGlobalStats();
+    }
+
+    function resetToSampleData() {
+      appData = {
+        clients: JSON.parse(JSON.stringify(SAMPLE_CLIENTS)),
+        invoices: JSON.parse(JSON.stringify(SAMPLE_INVOICES)),
+        settings: JSON.parse(JSON.stringify(SAMPLE_SETTINGS))
+      };
+      saveStateToStorage();
+      showToast('Sample database reloaded successfully');
+      renderCurrentTab();
+    }
+
+    // --- NAVIGATION TAB SWITCHING ---
+    function switchTab(tabId) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      // Reset sidebar nav highlights
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+        el.classList.add('hover:bg-slate-800', 'hover:text-white');
+      });
+
+      // Show selected tab
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) targetTab.classList.remove('hidden');
+
+      // Highlight corresponding sidebar button
+      const navBtn = document.getElementById(`nav-${tabId}`);
+      if (navBtn) {
+        navBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+        navBtn.classList.remove('hover:bg-slate-800', 'hover:text-white');
+      }
+
+      // Update Top Header Title
+      const titles = {
+        dashboard: 'Dashboard Overview',
+        invoices: 'Invoice Management',
+        clients: 'Client Manager',
+        portal: 'Client Portal Preview',
+        settings: 'System & Branding Settings'
+      };
+      document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
+
+      renderCurrentTab(tabId);
+    }
+
+    function renderCurrentTab(activeTab) {
+      renderDashboard();
+      renderInvoicesTable();
+      renderClientsGrid();
+      populatePortalSelector();
+      renderPortalView();
+      populateSettingsForm();
+    }
+
+    // --- CALCULATIONS HELPERS ---
+    function calculateInvoiceTotals(invoice) {
+      const subtotal = (invoice.items || []).reduce((acc, item) => acc + (Number(item.qty) * Number(item.price)), 0);
+      const taxAmount = subtotal * (Number(invoice.taxRate || 0) / 100);
+      const discAmount = subtotal * (Number(invoice.discountRate || 0) / 100);
+      const grandTotal = subtotal + taxAmount - discAmount;
+      return { subtotal, taxAmount, discAmount, grandTotal };
+    }
+
+    function formatCurrency(num) {
+      const sym = appData.settings.currency || '$';
+      return sym + Number(num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // --- DASHBOARD RENDERER ---
+    function updateGlobalStats() {
+      let totalRevenue = 0;
+      let totalOutstanding = 0;
+      let paidCount = 0;
+      let overdueCount = 0;
+
+      appData.invoices.forEach(inv => {
+        const { grandTotal } = calculateInvoiceTotals(inv);
+        if (inv.status === 'Paid') {
+          totalRevenue += grandTotal;
+          paidCount++;
+        } else if (inv.status === 'Pending' || inv.status === 'Draft') {
+          totalOutstanding += grandTotal;
+        } else if (inv.status === 'Overdue') {
+          totalOutstanding += grandTotal;
+          overdueCount++;
+        }
+      });
+
+      document.getElementById('stat-revenue').innerText = formatCurrency(totalRevenue);
+      document.getElementById('stat-outstanding').innerText = formatCurrency(totalOutstanding);
+      document.getElementById('stat-paid-count').innerText = paidCount;
+      document.getElementById('stat-overdue-count').innerText = overdueCount;
+    }
+
+    function renderDashboard() {
+      const tbody = document.getElementById('dash-recent-table');
+      tbody.innerHTML = '';
+
+      const recent = [...appData.invoices].slice(0, 5);
+
+      if (recent.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">No invoices generated yet.</td></tr>`;
+        return;
+      }
+
+      recent.forEach(inv => {
+        const client = appData.clients.find(c => c.id === inv.clientId) || { name: 'Unknown' };
+        const { grandTotal } = calculateInvoiceTotals(inv);
+        const statusBadge = getStatusBadge(inv.status);
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="py-3.5 px-5 font-bold text-slate-900">${inv.number}</td>
+          <td class="py-3.5 px-5 text-slate-600">${client.company ? client.company : client.name}</td>
+          <td class="py-3.5 px-5 font-extrabold text-slate-900">${formatCurrency(grandTotal)}</td>
+          <td class="py-3.5 px-5">${statusBadge}</td>
+          <td class="py-3.5 px-5 text-right">
+            <button onclick="viewInvoiceInPortal('${inv.id}')" class="text-xs font-bold text-blue-600 hover:text-blue-800">
+              View &rarr;
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- INVOICES TABLE RENDERER ---
+    function renderInvoicesTable() {
+      const tbody = document.getElementById('full-invoices-table');
+      tbody.innerHTML = '';
+
+      const search = document.getElementById('invoice-search').value.toLowerCase();
+      const statusFilter = document.getElementById('invoice-filter-status').value;
+
+      const filtered = appData.invoices.filter(inv => {
+        const client = appData.clients.find(c => c.id === inv.clientId) || { name: '', company: '' };
+        const matchesSearch = inv.number.toLowerCase().includes(search) || 
+                              client.name.toLowerCase().includes(search) || 
+                              (client.company && client.company.toLowerCase().includes(search));
+        const matchesStatus = statusFilter === 'all' || inv.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No matching invoices found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(inv => {
+        const client = appData.clients.find(c => c.id === inv.clientId) || { name: 'Unknown' };
+        const { grandTotal } = calculateInvoiceTotals(inv);
+        const badge = getStatusBadge(inv.status);
+
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition';
+        tr.innerHTML = `
+          <td class="py-3.5 px-5 font-bold text-slate-900">${inv.number}</td>
+          <td class="py-3.5 px-5">
+            <div class="font-semibold text-slate-800">${client.name}</div>
+            <div class="text-xs text-slate-400">${client.company || ''}</div>
+          </td>
+          <td class="py-3.5 px-5 text-xs text-slate-500">${inv.issueDate}</td>
+          <td class="py-3.5 px-5 text-xs text-slate-500">${inv.dueDate}</td>
+          <td class="py-3.5 px-5 font-extrabold text-slate-900">${formatCurrency(grandTotal)}</td>
+          <td class="py-3.5 px-5">${badge}</td>
+          <td class="py-3.5 px-5 text-right space-x-2">
+            <button onclick="viewInvoiceInPortal('${inv.id}')" class="text-slate-400 hover:text-blue-600 transition" title="View Portal">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button onclick="openInvoiceModal('${inv.id}')" class="text-slate-400 hover:text-amber-600 transition" title="Edit Invoice">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button onclick="deleteInvoice('${inv.id}')" class="text-slate-400 hover:text-rose-600 transition" title="Delete">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getStatusBadge(status) {
+      const styles = {
+        Paid: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        Pending: 'bg-amber-100 text-amber-700 border-amber-200',
+        Draft: 'bg-slate-100 text-slate-600 border-slate-200',
+        Overdue: 'bg-rose-100 text-rose-700 border-rose-200'
+      };
+      return `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold border ${styles[status] || styles.Draft}">${status}</span>`;
+    }
+
+    // --- CLIENT MANAGER RENDERER ---
+    function renderClientsGrid() {
+      const container = document.getElementById('clients-grid');
+      container.innerHTML = '';
+
+      if (appData.clients.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">No clients in directory yet. Click "Add Client" to get started!</div>`;
+        return;
+      }
+
+      appData.clients.forEach(client => {
+        // Calculate client stats
+        const clientInvoices = appData.invoices.filter(i => i.clientId === client.id);
+        const totalBilled = clientInvoices.reduce((acc, i) => acc + calculateInvoiceTotals(i).grandTotal, 0);
+
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition space-y-4';
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg">
+                ${client.name.charAt(0)}
+              </div>
+              <div class="flex space-x-1">
+                <button onclick="openClientModal('${client.id}')" class="w-7 h-7 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-slate-100 flex items-center justify-center transition">
+                  <i class="fa-solid fa-pen text-xs"></i>
+                </button>
+                <button onclick="deleteClient('${client.id}')" class="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 flex items-center justify-center transition">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-slate-900 text-base leading-tight">${client.name}</h4>
+              <p class="text-xs font-semibold text-slate-500">${client.company || 'Individual Client'}</p>
+            </div>
+
+            <div class="text-xs text-slate-500 space-y-1 pt-1">
+              <p class="flex items-center"><i class="fa-solid fa-envelope w-4 text-slate-400 me-1"></i> ${client.email}</p>
+              <p class="flex items-center"><i class="fa-solid fa-phone w-4 text-slate-400 me-1"></i> ${client.phone || 'No phone'}</p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="text-slate-500">${clientInvoices.length} Invoices</span>
+            <span class="font-extrabold text-slate-900">${formatCurrency(totalBilled)}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // --- CLIENT PORTAL SIMULATION ---
+    function populatePortalSelector() {
+      const select = document.getElementById('portal-invoice-select');
+      select.innerHTML = '';
+      appData.invoices.forEach(inv => {
+        const client = appData.clients.find(c => c.id === inv.clientId) || { name: 'Client' };
+        const opt = document.createElement('option');
+        opt.value = inv.id;
+        opt.innerText = `${inv.number} - ${client.name} (${inv.status})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderPortalView() {
+      const selectedId = document.getElementById('portal-invoice-select').value;
+      const inv = appData.invoices.find(i => i.id === selectedId) || appData.invoices[0];
+
+      if (!inv) return;
+
+      const client = appData.clients.find(c => c.id === inv.clientId) || { name: 'Sample Client', email: '', company: '', address: '' };
+      const biz = appData.settings;
+      const { subtotal, taxAmount, discAmount, grandTotal } = calculateInvoiceTotals(inv);
+
+      // Populate Header & Branding
+      document.getElementById('portal-biz-name').innerText = biz.bizName || 'NexScript Innovations';
+      document.getElementById('portal-biz-address').innerText = biz.bizAddress || '';
+      document.getElementById('portal-biz-email').innerText = biz.bizEmail || '';
+
+      const logoContainer = document.getElementById('portal-logo-container');
+      if (biz.logoUrl) {
+        logoContainer.innerHTML = `<img src="${biz.logoUrl}" class="max-h-12 object-contain" alt="Logo" />`;
+      } else {
+        logoContainer.innerHTML = `<div class="text-blue-600 font-extrabold text-2xl tracking-tight"><i class="fa-solid fa-bolt me-1"></i>${biz.bizName || 'INVOICE'}</div>`;
+      }
+
+      // Populate Status & Invoice Meta
+      document.getElementById('portal-invoice-num').innerText = inv.number;
+      document.getElementById('portal-issue-date').innerText = inv.issueDate;
+      document.getElementById('portal-due-date').innerText = inv.dueDate;
+
+      const badge = document.getElementById('portal-status-badge');
+      badge.innerText = inv.status;
+      badge.className = `inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+        inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' :
+        inv.status === 'Overdue' ? 'bg-rose-100 text-rose-700' :
+        inv.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'
+      }`;
+
+      // Show/Hide Pay Now Button
+      const payBtn = document.getElementById('portal-pay-btn');
+      if (inv.status === 'Paid') {
+        payBtn.classList.add('hidden');
+      } else {
+        payBtn.classList.remove('hidden');
+      }
+
+      // Populate Client Info
+      document.getElementById('portal-client-name').innerText = client.name;
+      document.getElementById('portal-client-company').innerText = client.company || '';
+      document.getElementById('portal-client-email').innerText = client.email || '';
+      document.getElementById('portal-client-address').innerText = client.address || '';
+      document.getElementById('portal-total-due').innerText = formatCurrency(grandTotal);
+
+      // Populate Line Items
+      const itemsTbody = document.getElementById('portal-items-table');
+      itemsTbody.innerHTML = '';
+      (inv.items || []).forEach(item => {
+        const rowTotal = Number(item.qty) * Number(item.price);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-3 px-2 font-medium text-slate-800">${item.description}</td>
+          <td class="py-3 px-2 text-center text-slate-600">${item.qty}</td>
+          <td class="py-3 px-2 text-right text-slate-600">${formatCurrency(item.price)}</td>
+          <td class="py-3 px-2 text-right font-bold text-slate-900">${formatCurrency(rowTotal)}</td>
+        `;
+        itemsTbody.appendChild(tr);
+      });
+
+      // Populate Calculation Box
+      document.getElementById('portal-subtotal').innerText = formatCurrency(subtotal);
+      document.getElementById('portal-tax-rate').innerText = inv.taxRate || 0;
+      document.getElementById('portal-tax-amount').innerText = formatCurrency(taxAmount);
+      document.getElementById('portal-disc-rate').innerText = inv.discountRate || 0;
+      document.getElementById('portal-disc-amount').innerText = `-${formatCurrency(discAmount)}`;
+      document.getElementById('portal-grand-total').innerText = formatCurrency(grandTotal);
+
+      document.getElementById('portal-notes').innerText = inv.notes || biz.paymentNotes || 'Thank you for your business!';
+    }
+
+    function viewInvoiceInPortal(invId) {
+      switchTab('portal');
+      const select = document.getElementById('portal-invoice-select');
+      select.value = invId;
+      renderPortalView();
+    }
+
+    function simulatePayment() {
+      const selectedId = document.getElementById('portal-invoice-select').value;
+      const inv = appData.invoices.find(i => i.id === selectedId);
+      if (inv) {
+        inv.status = 'Paid';
+        saveStateToStorage();
+        renderPortalView();
+        showToast('Payment successful! Invoice marked as Paid.');
+      }
+    }
+
+    // --- INVOICE MODAL & FORM LOGIC ---
+    function openInvoiceModal(invId = null) {
+      const modal = document.getElementById('invoice-modal');
+      const form = document.getElementById('invoice-form');
+      form.reset();
+
+      // Populate Client Options
+      const clientSelect = document.getElementById('inv-client-id');
+      clientSelect.innerHTML = '';
+      appData.clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = `${c.name} ${c.company ? `(${c.company})` : ''}`;
+        clientSelect.appendChild(opt);
+      });
+
+      const itemsTbody = document.getElementById('invoice-items-rows');
+      itemsTbody.innerHTML = '';
+
+      if (invId) {
+        document.getElementById('modal-invoice-title').innerText = 'Edit Invoice';
+        const inv = appData.invoices.find(i => i.id === invId);
+        document.getElementById('inv-id').value = inv.id;
+        document.getElementById('inv-number').value = inv.number;
+        document.getElementById('inv-client-id').value = inv.clientId;
+        document.getElementById('inv-status').value = inv.status;
+        document.getElementById('inv-issue-date').value = inv.issueDate;
+        document.getElementById('inv-due-date').value = inv.dueDate;
+        document.getElementById('inv-tax-rate').value = inv.taxRate;
+        document.getElementById('inv-discount-rate').value = inv.discountRate;
+        document.getElementById('inv-notes').value = inv.notes || '';
+
+        (inv.items || []).forEach(item => addInvoiceItemRow(item.description, item.qty, item.price));
+      } else {
+        document.getElementById('modal-invoice-title').innerText = 'Create New Invoice';
+        document.getElementById('inv-id').value = '';
+        document.getElementById('inv-number').value = `INV-2026-${String(appData.invoices.length + 1).padStart(3, '0')}`;
+        document.getElementById('inv-issue-date').valueAsDate = new Date();
+        
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 14);
+        document.getElementById('inv-due-date').valueAsDate = dueDate;
+
+        document.getElementById('inv-tax-rate').value = appData.settings.taxRate || 0;
+        document.getElementById('inv-discount-rate').value = 0;
+        document.getElementById('inv-notes').value = appData.settings.paymentNotes || '';
+
+        addInvoiceItemRow('Web Design & Development Services', 1, 500);
+      }
+
+      calculateModalTotals();
+      modal.classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoice-modal').classList.add('hidden');
+    }
+
+    function addInvoiceItemRow(desc = '', qty = 1, price = 0) {
+      const tbody = document.getElementById('invoice-items-rows');
+      const tr = document.createElement('tr');
+      tr.className = 'item-row';
+      tr.innerHTML = `
+        <td class="py-2 px-3">
+          <input type="text" class="item-desc w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs" placeholder="Item description..." value="${desc}" required />
+        </td>
+        <td class="py-2 px-3">
+          <input type="number" min="1" step="1" oninput="calculateModalTotals()" class="item-qty w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs text-center" value="${qty}" required />
+        </td>
+        <td class="py-2 px-3">
+          <input type="number" step="0.01" min="0" oninput="calculateModalTotals()" class="item-price w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs text-right font-medium" value="${price}" required />
+        </td>
+        <td class="py-2 px-3 text-right font-bold text-xs text-slate-800 item-row-total">$0.00</td>
+        <td class="py-2 px-3 text-center">
+          <button type="button" onclick="removeInvoiceItemRow(this)" class="text-slate-400 hover:text-rose-600">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      calculateModalTotals();
+    }
+
+    function removeInvoiceItemRow(btn) {
+      const row = btn.closest('tr');
+      const tbody = document.getElementById('invoice-items-rows');
+      if (tbody.querySelectorAll('tr').length > 1) {
+        row.remove();
+        calculateModalTotals();
+      } else {
+        showToast('At least one line item is required.');
+      }
+    }
+
+    function calculateModalTotals() {
+      let subtotal = 0;
+      document.querySelectorAll('#invoice-items-rows .item-row').forEach(row => {
+        const qty = Number(row.querySelector('.item-qty').value) || 0;
+        const price = Number(row.querySelector('.item-price').value) || 0;
+        const total = qty * price;
+        subtotal += total;
+        row.querySelector('.item-row-total').innerText = formatCurrency(total);
+      });
+
+      const taxRate = Number(document.getElementById('inv-tax-rate').value) || 0;
+      const discRate = Number(document.getElementById('inv-discount-rate').value) || 0;
+
+      const taxAmount = subtotal * (taxRate / 100);
+      const discAmount = subtotal * (discRate / 100);
+      const grandTotal = subtotal + taxAmount - discAmount;
+
+      document.getElementById('modal-calculated-total').innerText = formatCurrency(grandTotal);
+    }
+
+    function handleSaveInvoice(e) {
+      e.preventDefault();
+
+      const invId = document.getElementById('inv-id').value;
+      const items = [];
+      document.querySelectorAll('#invoice-items-rows .item-row').forEach(row => {
+        items.push({
+          description: row.querySelector('.item-desc').value,
+          qty: Number(row.querySelector('.item-qty').value),
+          price: Number(row.querySelector('.item-price').value)
+        });
+      });
+
+      const invoiceData = {
+        id: invId || `inv_${Date.now()}`,
+        number: document.getElementById('inv-number').value,
+        clientId: document.getElementById('inv-client-id').value,
+        status: document.getElementById('inv-status').value,
+        issueDate: document.getElementById('inv-issue-date').value,
+        dueDate: document.getElementById('inv-due-date').value,
+        taxRate: Number(document.getElementById('inv-tax-rate').value),
+        discountRate: Number(document.getElementById('inv-discount-rate').value),
+        notes: document.getElementById('inv-notes').value,
+        items: items
+      };
+
+      if (invId) {
+        const idx = appData.invoices.findIndex(i => i.id === invId);
+        if (idx !== -1) appData.invoices[idx] = invoiceData;
+      } else {
+        appData.invoices.unshift(invoiceData);
+      }
+
+      saveStateToStorage();
+      closeInvoiceModal();
+      renderCurrentTab();
+      showToast('Invoice saved successfully!');
+    }
+
+    function deleteInvoice(invId) {
+      if (confirm('Are you sure you want to delete this invoice?')) {
+        appData.invoices = appData.invoices.filter(i => i.id !== invId);
+        saveStateToStorage();
+        renderCurrentTab();
+        showToast('Invoice deleted.');
+      }
+    }
+
+    // --- CLIENT MODAL & FORM LOGIC ---
+    function openClientModal(clientId = null) {
+      const modal = document.getElementById('client-modal');
+      const form = document.getElementById('client-form');
+      form.reset();
+
+      if (clientId) {
+        document.getElementById('modal-client-title').innerText = 'Edit Client';
+        const client = appData.clients.find(c => c.id === clientId);
+        document.getElementById('client-id').value = client.id;
+        document.getElementById('client-name').value = client.name;
+        document.getElementById('client-company').value = client.company || '';
+        document.getElementById('client-email').value = client.email;
+        document.getElementById('client-phone').value = client.phone || '';
+        document.getElementById('client-address').value = client.address || '';
+      } else {
+        document.getElementById('modal-client-title').innerText = 'Add New Client';
+        document.getElementById('client-id').value = '';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeClientModal() {
+      document.getElementById('client-modal').classList.add('hidden');
+    }
+
+    function handleSaveClient(e) {
+      e.preventDefault();
+
+      const clientId = document.getElementById('client-id').value;
+      const clientData = {
+        id: clientId || `cli_${Date.now()}`,
+        name: document.getElementById('client-name').value,
+        company: document.getElementById('client-company').value,
+        email: document.getElementById('client-email').value,
+        phone: document.getElementById('client-phone').value,
+        address: document.getElementById('client-address').value
+      };
+
+      if (clientId) {
+        const idx = appData.clients.findIndex(c => c.id === clientId);
+        if (idx !== -1) appData.clients[idx] = clientData;
+      } else {
+        appData.clients.push(clientData);
+      }
+
+      saveStateToStorage();
+      closeClientModal();
+      renderCurrentTab();
+      showToast('Client record saved!');
+    }
+
+    function deleteClient(clientId) {
+      if (confirm('Deleting this client will leave existing invoices without client metadata. Continue?')) {
+        appData.clients = appData.clients.filter(c => c.id !== clientId);
+        saveStateToStorage();
+        renderCurrentTab();
+        showToast('Client deleted.');
+      }
+    }
+
+    // --- SETTINGS FORM LOGIC ---
+    function populateSettingsForm() {
+      const s = appData.settings;
+      document.getElementById('set-biz-name').value = s.bizName || '';
+      document.getElementById('set-biz-email').value = s.bizEmail || '';
+      document.getElementById('set-biz-address').value = s.bizAddress || '';
+      document.getElementById('set-currency').value = s.currency || '$';
+      document.getElementById('set-tax-rate').value = s.taxRate || 0;
+      document.getElementById('set-logo-url').value = s.logoUrl || '';
+      document.getElementById('set-payment-notes').value = s.paymentNotes || '';
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      appData.settings = {
+        bizName: document.getElementById('set-biz-name').value,
+        bizEmail: document.getElementById('set-biz-email').value,
+        bizAddress: document.getElementById('set-biz-address').value,
+        currency: document.getElementById('set-currency').value,
+        taxRate: Number(document.getElementById('set-tax-rate').value),
+        logoUrl: document.getElementById('set-logo-url').value,
+        paymentNotes: document.getElementById('set-payment-notes').value
+      };
+      saveStateToStorage();
+      showToast('Branding & Business settings saved!');
+      renderCurrentTab();
+    }
+
+    // --- IMPORT / EXPORT JSON BACKUPS ---
+    function exportDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `invoicify_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Database exported to JSON file!');
+    }
+
+    function importDataJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (imported.clients && imported.invoices && imported.settings) {
+            appData = imported;
+            saveStateToStorage();
+            renderCurrentTab();
+            showToast('Database imported successfully!');
+          } else {
+            showToast('Invalid backup file structure.');
+          }
+        } catch(err) {
+          showToast('Failed to parse JSON file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // --- TOAST NOTIFICATIONS ---
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 border border-slate-700 animate-bounce pointer-events-auto';
+      toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+  </script>
+</body>
+</html>
